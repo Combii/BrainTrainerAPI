@@ -38,7 +38,7 @@ namespace BrainTrainerAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {
-            
+
         }
     }
 }

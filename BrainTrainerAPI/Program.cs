@@ -14,6 +14,7 @@ namespace BrainTrainerAPI
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+            Console.
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
