@@ -26,7 +26,7 @@ namespace BrainTrainerAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddIdentityCore<BrainTrainerUser>();
+            services.AddIdentityCore<BrainTrainerUser>(options =>{});
             services.AddScoped<IUserStore<BrainTrainerUser>,BrainTrainerUserStore>();
         }
 

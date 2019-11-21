@@ -13,6 +13,37 @@ namespace BrainTrainerAPI
 {
     public class BrainTrainerUserStore : IUserStore<BrainTrainerUser>, IUserPasswordStore<BrainTrainerUser>
     {
+        public void Dispose()
+        {
+        }
+
+        public Task<string> GetUserIdAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.Id);
+        }
+
+        public Task<string> GetUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.UserName);
+        }
+
+        public Task SetUserNameAsync(BrainTrainerUser user, string userName, CancellationToken cancellationToken)
+        {
+            user.UserName = userName;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetNormalizedUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.NormalizedUserName);
+        }
+
+        public Task SetNormalizedUserNameAsync(BrainTrainerUser user, string normalizedName, CancellationToken cancellationToken)
+        {
+            user.NormalizedUserName = normalizedName;
+            return Task.CompletedTask;
+        }
+
         public static DbConnection GetOpenConnection()
         {
             var connection = new SqlConnection("Data Source=(LocalDb)\\MSSQLLocalDB;" +
@@ -21,10 +52,6 @@ namespace BrainTrainerAPI
             connection.Open();
 
             return connection;
-        }
-
-        public void Dispose()
-        {
         }
 
         public async Task<IdentityResult> CreateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
@@ -37,6 +64,30 @@ namespace BrainTrainerAPI
                     "[NormalizedUserName]," +
                     "[PasswordHash]) " +
                     "Values(@id,@userName,@normalizedUserName,@passwordHash)",
+                    new
+                    {
+                        id = user.Id,
+                        userName = user.UserName,
+                        normalizedUserName = user.NormalizedUserName,
+                        passwordHash = user.PasswordHash
+                    }
+                );
+            }
+
+            return IdentityResult.Success;
+        }
+
+        public async Task<IdentityResult> UpdateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            using (var connection = GetOpenConnection())
+            {
+                await connection.ExecuteAsync(
+                    "update Users " +
+                    "set [Id] = @id," +
+                    "[UserName] = @userName," +
+                    "[NormalizedUserName] = @normalizedUserName," +
+                    "[PasswordHash] = @passwordHash " +
+                    "where [Id] = @id",
                     new
                     {
                         id = user.Id,
@@ -75,55 +126,10 @@ namespace BrainTrainerAPI
             }
         }
 
-        public Task<string> GetNormalizedUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        public Task SetPasswordHashAsync(BrainTrainerUser user, string passwordHash, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.NormalizedUserName);
-        }
-
-        public Task<string> GetUserIdAsync(BrainTrainerUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.Id);
-        }
-
-        public Task<string> GetUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.UserName);
-        }
-
-        public Task SetNormalizedUserNameAsync(BrainTrainerUser user, string normalizedName, CancellationToken cancellationToken)
-        {
-            user.NormalizedUserName = normalizedName;
+            user.PasswordHash = passwordHash;
             return Task.CompletedTask;
-        }
-
-        public Task SetUserNameAsync(BrainTrainerUser user, string userName, CancellationToken cancellationToken)
-        {
-            user.UserName = userName;
-            return Task.CompletedTask;
-        }
-
-        public async Task<IdentityResult> UpdateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
-        {
-            using (var connection = GetOpenConnection())
-            {
-                await connection.ExecuteAsync(
-                    "update Users " +
-                    "set [Id] = @id," +
-                    "[UserName] = @userName," +
-                    "[NormalizedUserName] = @normalizedUserName," +
-                    "[PasswordHash] = @passwordHash " +
-                    "where [Id] = @id",
-                    new
-                    {
-                        id = user.Id,
-                        userName = user.UserName,
-                        normalizedUserName = user.NormalizedUserName,
-                        passwordHash = user.PasswordHash
-                    }
-                );
-            }
-
-            return IdentityResult.Success;
         }
 
         public Task<string> GetPasswordHashAsync(BrainTrainerUser user, CancellationToken cancellationToken)
@@ -134,12 +140,6 @@ namespace BrainTrainerAPI
         public Task<bool> HasPasswordAsync(BrainTrainerUser user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.PasswordHash != null);
-        }
-
-        public Task SetPasswordHashAsync(BrainTrainerUser user, string passwordHash, CancellationToken cancellationToken)
-        {
-            user.PasswordHash = passwordHash;
-            return Task.CompletedTask;
         }
     }
 }
