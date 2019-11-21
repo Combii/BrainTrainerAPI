@@ -33,5 +33,12 @@ namespace BrainTrainerAPI.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterModel model)
+        {
+            
+        }
     }
 }

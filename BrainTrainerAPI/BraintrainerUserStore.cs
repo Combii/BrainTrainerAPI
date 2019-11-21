@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BrainTrainerAPI
 {
-    public class BrainTrainerUserStore : IUserStore<BrainTrainerUser>
+    public class BrainTrainerUserStore : IUserStore<BrainTrainerUser>, IUserPasswordStore<BrainTrainerUser>
     {
         public static DbConnection GetOpenConnection()
         {
@@ -56,14 +56,24 @@ namespace BrainTrainerAPI
             throw new NotImplementedException();
         }
 
-        public Task<BrainTrainerUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<BrainTrainerUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var connection = GetOpenConnection())
+            {
+                return await connection.QueryFirstOrDefaultAsync<BrainTrainerUser>(
+                    "select * From Users where Id = @id",
+                    new { id = userId });
+            }
         }
 
-        public Task<BrainTrainerUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<BrainTrainerUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var connection = GetOpenConnection())
+            {
+                return await connection.QueryFirstOrDefaultAsync<BrainTrainerUser>(
+                    "select * From Users where NormalizedUserName = @name",
+                    new { name = normalizedUserName });
+            }
         }
 
         public Task<string> GetNormalizedUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
@@ -93,9 +103,44 @@ namespace BrainTrainerAPI
             return Task.CompletedTask;
         }
 
-        public Task<IdentityResult> UpdateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var connection = GetOpenConnection())
+            {
+                await connection.ExecuteAsync(
+                    "update PluralsightUsers " +
+                    "set [Id] = @id," +
+                    "[UserName] = @userName," +
+                    "[NormalizedUserName] = @normalizedUserName," +
+                    "[PasswordHash] = @passwordHash " +
+                    "where [Id] = @id",
+                    new
+                    {
+                        id = user.Id,
+                        userName = user.Username,
+                        normalizedUserName = user.NormalizedUserName,
+                        passwordHash = user.PasswordHash
+                    }
+                );
+            }
+
+            return IdentityResult.Success;
+        }
+
+        public Task<string> GetPasswordHashAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.PasswordHash);
+        }
+
+        public Task<bool> HasPasswordAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.PasswordHash != null);
+        }
+
+        public Task SetPasswordHashAsync(BrainTrainerUser user, string passwordHash, CancellationToken cancellationToken)
+        {
+            user.PasswordHash = passwordHash;
+            return Task.CompletedTask;
         }
     }
 }
