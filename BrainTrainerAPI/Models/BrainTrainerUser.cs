@@ -8,7 +8,7 @@ namespace BrainTrainerAPI.Models
     public class BrainTrainerUser
     {
         public string Id { get; set; }
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string NormalizedUserName { get; set; }
         public string PasswordHash { get; set; }
 

@@ -25,7 +25,6 @@ namespace BrainTrainerAPI
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public async Task<IdentityResult> CreateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
@@ -41,7 +40,7 @@ namespace BrainTrainerAPI
                     new
                     {
                         id = user.Id,
-                        userName = user.Username,
+                        userName = user.UserName,
                         normalizedUserName = user.NormalizedUserName,
                         passwordHash = user.PasswordHash
                     }
@@ -88,7 +87,7 @@ namespace BrainTrainerAPI
 
         public Task<string> GetUserNameAsync(BrainTrainerUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.Username);
+            return Task.FromResult(user.UserName);
         }
 
         public Task SetNormalizedUserNameAsync(BrainTrainerUser user, string normalizedName, CancellationToken cancellationToken)
@@ -99,7 +98,7 @@ namespace BrainTrainerAPI
 
         public Task SetUserNameAsync(BrainTrainerUser user, string userName, CancellationToken cancellationToken)
         {
-            user.Username = userName;
+            user.UserName = userName;
             return Task.CompletedTask;
         }
 
@@ -108,7 +107,7 @@ namespace BrainTrainerAPI
             using (var connection = GetOpenConnection())
             {
                 await connection.ExecuteAsync(
-                    "update PluralsightUsers " +
+                    "update Users " +
                     "set [Id] = @id," +
                     "[UserName] = @userName," +
                     "[NormalizedUserName] = @normalizedUserName," +
@@ -117,7 +116,7 @@ namespace BrainTrainerAPI
                     new
                     {
                         id = user.Id,
-                        userName = user.Username,
+                        userName = user.UserName,
                         normalizedUserName = user.NormalizedUserName,
                         passwordHash = user.PasswordHash
                     }
