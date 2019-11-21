@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BrainTrainerAPI.Models;
+using Dapper;
 using Microsoft.AspNetCore.Identity;
 
 namespace BrainTrainerAPI
@@ -21,14 +22,33 @@ namespace BrainTrainerAPI
 
             return connection;
         }
+
         public void Dispose()
         {
             throw new NotImplementedException();
         }
 
-        public Task<IdentityResult> CreateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(BrainTrainerUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var connection = GetOpenConnection())
+            {
+                await connection.ExecuteAsync(
+                    "insert into Users([Id]," +
+                    "[UserName]," +
+                    "[NormalizedUserName]," +
+                    "[PasswordHash]) " +
+                    "Values(@id,@userName,@normalizedUserName,@passwordHash)",
+                    new
+                    {
+                        id = user.Id,
+                        userName = user.Username,
+                        normalizedUserName = user.NormalizedUserName,
+                        passwordHash = user.PasswordHash
+                    }
+                );
+            }
+
+            return IdentityResult.Success;
         }
 
         public Task<IdentityResult> DeleteAsync(BrainTrainerUser user, CancellationToken cancellationToken)
