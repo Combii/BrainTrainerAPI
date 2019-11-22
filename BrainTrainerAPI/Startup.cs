@@ -27,7 +27,7 @@ namespace BrainTrainerAPI
         {
             services.AddControllersWithViews();
             services.AddIdentityCore<BrainTrainerUser>(options =>{});
-            services.AddScoped<IUserStore<BrainTrainerUser>,BrainTrainerUserStore>();
+            services.AddScoped<IUserStore<BrainTrainerUser>, BrainTrainerUserStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
