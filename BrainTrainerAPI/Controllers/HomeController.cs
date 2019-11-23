@@ -15,9 +15,9 @@ namespace BrainTrainerAPI.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly UserManager<BrainTrainerUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(UserManager<BrainTrainerUser> userManager)
+        public HomeController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
@@ -62,7 +62,7 @@ namespace BrainTrainerAPI.Controllers
 
                 if (user == null)
                 {
-                    user = new BrainTrainerUser
+                    user = new IdentityUser
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserName = model.UserName

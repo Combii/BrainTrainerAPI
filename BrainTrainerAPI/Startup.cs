@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using BrainTrainerAPI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,10 +29,18 @@ namespace BrainTrainerAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+
+            var connectionString =
+                @"Data Source=(LocalDb)\MSSQLLocalDB;database=PluralsightDemo.PluralsightUser;trusted_connection=yes;";
+
+            var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            services.AddDbContext<IdentityDbContext>(opt => opt.UseSqlServer(connectionString,
+                sql => sql.MigrationsAssembly(migrationAssembly)));
             
             services.AddControllersWithViews();
-            services.AddIdentityCore<BrainTrainerUser>(options =>{});
-            services.AddScoped<IUserStore<BrainTrainerUser>, BrainTrainerUserStore>();
+            services.AddIdentityCore<IdentityUser>(options =>{});
+            services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser,IdentityDbContext>>();
 
             services.AddAuthentication("cookies")
                 .AddCookie("cookies", options => options.LoginPath = "/Home/Login");
