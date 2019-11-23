@@ -32,15 +32,16 @@ namespace BrainTrainerAPI
 
 
             var connectionString =
-                @"Data Source=(LocalDb)\MSSQLLocalDB;database=PluralsightDemo.PluralsightUser;trusted_connection=yes;";
+                @"Data Source=(LocalDb)\MSSQLLocalDB;database=BrainTrainer.Users;trusted_connection=yes;";
 
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            services.AddDbContext<IdentityDbContext>(opt => opt.UseSqlServer(connectionString,
+            services.AddDbContext<BrainTrainerDbContext>(opt => opt.UseSqlServer(connectionString,
                 sql => sql.MigrationsAssembly(migrationAssembly)));
             
             services.AddControllersWithViews();
-            services.AddIdentityCore<IdentityUser>(options =>{});
-            services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser,IdentityDbContext>>();
+            services.AddIdentityCore<BrainTrainerUser>(options =>{});
+            services.AddScoped<IUserStore<BrainTrainerUser>, 
+                UserOnlyStore<BrainTrainerUser, BrainTrainerDbContext>>();
 
             services.AddAuthentication("cookies")
                 .AddCookie("cookies", options => options.LoginPath = "/Home/Login");
