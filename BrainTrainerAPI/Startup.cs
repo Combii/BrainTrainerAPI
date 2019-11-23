@@ -25,9 +25,14 @@ namespace BrainTrainerAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
+            
             services.AddControllersWithViews();
             services.AddIdentityCore<BrainTrainerUser>(options =>{});
-            services.AddScoped<IUserStore<BrainTrainerUser>,BrainTrainerUserStore>();
+            services.AddScoped<IUserStore<BrainTrainerUser>, BrainTrainerUserStore>();
+
+            services.AddAuthentication("cookies")
+                .AddCookie("cookies", options => options.LoginPath = "/Home/Login");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +41,7 @@ namespace BrainTrainerAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseAuthentication();
             }
             else
             {
